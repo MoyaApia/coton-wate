@@ -1,0 +1,172 @@
+PyMySQL==0.9.3
+
+#_______________________ code de test _____________________________
+@staticmethod
+    def create(nom):
+        '''
+        Enregistrement d\'une categorie dans la base de donnees elle recoit le nom de la categorie
+        apres insertion, il retourne le nombre de lignes enrgistrées qui peux etre 0 ou 1
+        0: l'insertion a échoué, 1: l'insertion s'est bien passée
+        
+        '''
+
+        ligne = 0
+        try:
+            CONNECTION.ping() # ouvrir la connexion si elle a été fermée
+            with CONNECTION.cursor() as cursor:
+                # Enregistrer
+                
+                sql = "INSERT INTO `categories` (`nom`) VALUES (%s)"
+                ligne = cursor.execute(sql, (nom))
+                									
+
+        except Exception as e:
+            print('une erreur est survenue')
+            print(e)
+            CONNECTION.rollback()
+        else:
+            CONNECTION.commit()
+        finally:
+            CONNECTION.close()
+        return ligne
+
+    @staticmethod
+    def getAll():
+        """
+        Cette fonction permet de recuperer toutes lignes de la table categories
+        ensuite retourner le resultat sous form de dictionaire
+        """
+        categories = None
+        try:
+            CONNECTION.ping() # ouvrir la connexion si elle a été fermée
+            with CONNECTION.cursor() as cursor:
+                # Enregistrer
+                sql = "SELECT * FROM `categories` "
+                cursor.execute(sql)
+                categories = cursor.fetchall()
+
+        except Exception as e:
+            print('une erreur est survenue')
+            print(e)
+        
+        finally:
+            CONNECTION.close()
+        
+        return categories
+
+#__________________________________________________________ test mon code arduino _________________________________________________
+import serial,time
+import mariadb
+import sys
+
+
+if __name__ == '__main__':
+    
+    #print('Running. Press CTRL-C to exit.')
+    with serial.Serial("/dev/ttyUSB0", 9600, timeout=1) as arduino:
+        time.sleep(0.1) #wait for serial to open
+        if arduino.isOpen():
+            #print("{} connected!".format(arduino.port))
+            try:
+                while True:
+                    answer=arduino.readline()
+                    if len(answer)>0: 
+                        s = answer.decode("utf-8")
+                        a = s.split('_')
+                        if len(a)>=4:
+                            a[3]= a[3].replace("\x00", "")
+                            print('|ID :',a[0], 'Code couleur :',a[1], 'Code article :', a[2], 'taille :',a[3])
+                            
+                        else:
+                            print('|ID :',a[0], 'etiquette non attribuée')
+                           
+                       
+            except KeyboardInterrupt:
+                print("KeyboardInterrupt has been caught.")
+
+
+code hoang :
+
+import serial
+
+def connect_and_run():
+    ser = serial.Serial()
+    ser.baudrate = 9600
+    ser.port = 'COM7'
+    try:
+        ser.open()
+    except:
+        print("Can't connect to the robot...")
+    if ser.isOpen():
+        ser.write(b"1")
+    return ser
+
+def get_data(ser):
+    while True:
+        data = ser.readline()
+        #write to database
+        print(data)
+
+ser = connect_and_run()
+get_data(ser)
+
+
+
+
+
+
+
+
+
+        self.root = Tk()
+        self.root.attributes('-topmost',True)
+        self.root.configure(bg='white')
+        self.root.title('COTONWATE : GESTION DES STOCK')
+        self.frame_categorie = None
+        self.menu = Menu(self.root)
+        self.root['menu'] = self.menu
+        #self.menu.add_command(label='vetement', command=self.show_categorie)
+
+        #_____________________________________ mon code __________________________________________
+
+        image_fond = Image.open("Mod1.jpg")
+        image_logo = Image.open("logo.png")
+        image_fond.paste(image_logo,(20,250))
+        photo_fond = ImageTk.PhotoImage(image_fond)
+
+        bloc1 = Canvas(self.root,  width = 1480, height = 500)
+        bloc1.create_image(0,0, anchor = NW, image=photo_fond)
+        bloc1.pack()
+
+        bloc3 = Canvas(self.root, width=1480, height=500, bg="white").place(y=500)
+        l = Label(bloc3, text = "GESTION DES STOCKS DES VETEMENTS")
+        l.config(font =("Arial Black", 30), background="white")
+        l.pack( padx=10, pady=20)
+
+        bloc2 = Canvas(self.root, width=1480, height=50, bg='ivory').pack(side=BOTTOM, padx=0, pady=0)
+
+        im = PhotoImage (file = r"C:\Users\user\cotonwate_project\button2.png")
+        l1 = Label(self.root, text = "Suivre le robot")
+        l1.config(font =("Arial Black", 16), background="white")
+        l1.place(x=430, y=620)
+        b=Button(self.root,image=im,text ='Suivre le robot', command=self.show_categorie)
+        b.place(x=350, y=670)
+
+        l2 = Label(self.root, text = "Gérer les stocks")
+        l2.config(font =("Arial Black", 16), background="white")
+        l2.place(x=870, y=620)
+        b2=Button(self.root,image=im,text ='Suivre le robot').place(x=800, y=670)
+
+#_______________________ reste code main.categorie_views_________________________________________________________
+   #    if self.frame_categorie is None: 
+    #         self.frame_categorie = Frame(self.root)
+    #         #self.frame_categorie.pack()
+    #         #self.frame_categorie.config(bg="#006699")
+    #         self.frame_categorie.grid(row=0, column=0) #fficher les categorie
+    #         # if page_acceuil is not None:
+    #         #      page_acceuil.grid_forget() #retirer la page des produits
+    #         #      page_acceuil = None
+    #    else :
+    #         self.frame_categorie.grid_forget()
+    #         self.frame_categorie = None
+    #         CategorieView(self.frame_categorie) 
